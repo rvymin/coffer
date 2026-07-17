@@ -1,0 +1,239 @@
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/PublicSans-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/PublicSans-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/PublicSans-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/PublicSans-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./assets/fonts/PublicSans-800.woff2') format('woff2');
+}
+
+:root {
+  --text: #5b5766;
+  --text-h: #17151f;
+  --text-dim: #8b8794;
+
+  --bg: #f3f2f7;
+  --surface: #ffffff;
+  --surface-2: #f8f7fb;
+  --border: #e6e4ec;
+  --border-strong: #d9d6e2;
+
+  --accent: #6d5ff0;
+  --accent-2: #9b6ff5;
+  --accent-bg: rgba(109, 95, 240, 0.09);
+  --accent-border: rgba(109, 95, 240, 0.35);
+  --accent-contrast: #ffffff;
+
+  --income: #16a34a;
+  --income-bg: rgba(22, 163, 74, 0.1);
+  --expense: #e04f5f;
+  --expense-bg: rgba(224, 79, 95, 0.1);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(23, 21, 31, 0.05);
+  --shadow-md: 0 6px 16px -4px rgba(23, 21, 31, 0.1), 0 2px 4px -2px rgba(23, 21, 31, 0.06);
+  --shadow-lg: 0 20px 40px -12px rgba(23, 21, 31, 0.18);
+  --shadow-accent: 0 8px 20px -6px rgba(109, 95, 240, 0.45);
+
+  --sans: 'Public Sans', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  font: 500 14.5px/1.5 var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #a9a5b4;
+    --text-h: #f4f2f8;
+    --text-dim: #6f6b7c;
+
+    --bg: #131217;
+    --surface: #1c1a22;
+    --surface-2: #232029;
+    --border: #2c2933;
+    --border-strong: #3a3644;
+
+    --accent: #8a7bf7;
+    --accent-2: #b18cf9;
+    --accent-bg: rgba(138, 123, 247, 0.14);
+    --accent-border: rgba(138, 123, 247, 0.4);
+    --accent-contrast: #ffffff;
+
+    --income: #4ade80;
+    --income-bg: rgba(74, 222, 128, 0.12);
+    --expense: #f87171;
+    --expense-bg: rgba(248, 113, 113, 0.12);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.55);
+    --shadow-accent: 0 8px 20px -6px rgba(138, 123, 247, 0.4);
+  }
+}
+
+/* Manual theme override (Settings > Appearance) takes precedence over the OS preference above. */
+:root[data-theme='light'] {
+  --text: #5b5766;
+  --text-h: #17151f;
+  --text-dim: #8b8794;
+
+  --bg: #f3f2f7;
+  --surface: #ffffff;
+  --surface-2: #f8f7fb;
+  --border: #e6e4ec;
+  --border-strong: #d9d6e2;
+
+  --accent: #6d5ff0;
+  --accent-2: #9b6ff5;
+  --accent-bg: rgba(109, 95, 240, 0.09);
+  --accent-border: rgba(109, 95, 240, 0.35);
+  --accent-contrast: #ffffff;
+
+  --income: #16a34a;
+  --income-bg: rgba(22, 163, 74, 0.1);
+  --expense: #e04f5f;
+  --expense-bg: rgba(224, 79, 95, 0.1);
+
+  --shadow-sm: 0 1px 2px rgba(23, 21, 31, 0.05);
+  --shadow-md: 0 6px 16px -4px rgba(23, 21, 31, 0.1), 0 2px 4px -2px rgba(23, 21, 31, 0.06);
+  --shadow-lg: 0 20px 40px -12px rgba(23, 21, 31, 0.18);
+  --shadow-accent: 0 8px 20px -6px rgba(109, 95, 240, 0.45);
+}
+
+:root[data-theme='dark'] {
+  --text: #a9a5b4;
+  --text-h: #f4f2f8;
+  --text-dim: #6f6b7c;
+
+  --bg: #131217;
+  --surface: #1c1a22;
+  --surface-2: #232029;
+  --border: #2c2933;
+  --border-strong: #3a3644;
+
+  --accent: #8a7bf7;
+  --accent-2: #b18cf9;
+  --accent-bg: rgba(138, 123, 247, 0.14);
+  --accent-border: rgba(138, 123, 247, 0.4);
+  --accent-contrast: #ffffff;
+
+  --income: #4ade80;
+  --income-bg: rgba(74, 222, 128, 0.12);
+  --expense: #f87171;
+  --expense-bg: rgba(248, 113, 113, 0.12);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.55);
+  --shadow-accent: 0 8px 20px -6px rgba(138, 123, 247, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--sans);
+  font-weight: 700;
+  color: var(--text-h);
+  letter-spacing: -0.01em;
+  margin: 0 0 4px;
+}
+
+h1 {
+  font-size: 23px;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: 15.5px;
+}
+h3 {
+  font-size: 13.5px;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+::selection {
+  background: var(--accent-bg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mono-nums {
+  font-variant-numeric: tabular-nums;
+}
