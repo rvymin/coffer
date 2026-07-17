@@ -21,6 +21,7 @@ export interface Category {
 export interface Transaction {
   id: string
   accountId: string
+  toAccountId: string | null
   categoryId: string | null
   kind: TxKind
   amount: number

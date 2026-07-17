@@ -41,6 +41,14 @@ export function useFinanceData() {
     for (const tx of transactions) {
       const current = map.get(tx.accountId) ?? 0
       map.set(tx.accountId, current + (tx.kind === 'income' ? tx.amount : -tx.amount))
+      // A transfer with a destination account moves money between two tracked accounts, so the
+      // other side needs a matching credit — otherwise the amount would just vanish from total
+      // assets instead of moving. A transfer with no toAccountId (e.g. a debt payment) is money
+      // leaving the system entirely, so only the source side changes.
+      if (tx.kind === 'transfer' && tx.toAccountId) {
+        const currentTo = map.get(tx.toAccountId) ?? 0
+        map.set(tx.toAccountId, currentTo + tx.amount)
+      }
     }
     return map
   }, [accounts, transactions])

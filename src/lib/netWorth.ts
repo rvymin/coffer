@@ -8,8 +8,10 @@ export interface NetWorthPoint {
   netWorth: number
 }
 
-// Mirrors balancesByAccount in useFinanceData: income adds to a balance, expense and
-// transfer both subtract (a transfer is cash leaving the account, e.g. a debt payment).
+// Mirrors balancesByAccount in useFinanceData: income adds to a balance, expense and transfer
+// both subtract from the source account (a transfer with no toAccountId is cash leaving the
+// system entirely, e.g. a debt payment). A transfer *with* a toAccountId also credits that
+// destination account, since it's moving money between two tracked accounts rather than losing it.
 function accountSign(kind: TxKind): number {
   return kind === 'income' ? 1 : -1
 }
@@ -24,8 +26,12 @@ export function netWorthSeries(
   return months.map((month) => {
     const assets = accounts.reduce((sum, account) => {
       const txTotal = transactions
-        .filter((tx) => tx.accountId === account.id && monthOf(tx.date) <= month)
-        .reduce((s, tx) => s + accountSign(tx.kind) * tx.amount, 0)
+        .filter((tx) => monthOf(tx.date) <= month)
+        .reduce((s, tx) => {
+          if (tx.accountId === account.id) s += accountSign(tx.kind) * tx.amount
+          if (tx.kind === 'transfer' && tx.toAccountId === account.id) s += tx.amount
+          return s
+        }, 0)
       return sum + account.startingBalance + txTotal
     }, 0)
 

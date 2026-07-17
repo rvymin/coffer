@@ -86,6 +86,7 @@ export default function BulkAddModal({ data, onClose }: { data: FinanceData; onC
         validRows.map((r) =>
           window.api.transactions.create({
             accountId: r.accountId,
+            toAccountId: null,
             categoryId: r.categoryId || null,
             kind: r.kind,
             amount: Number(r.amount),

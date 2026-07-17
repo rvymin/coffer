@@ -78,6 +78,7 @@ export async function initDb(userDataDir: string) {
     CREATE TABLE IF NOT EXISTS transactions (
       id TEXT PRIMARY KEY,
       accountId TEXT NOT NULL,
+      toAccountId TEXT,
       categoryId TEXT,
       kind TEXT NOT NULL,
       amount REAL NOT NULL,
@@ -86,6 +87,7 @@ export async function initDb(userDataDir: string) {
       createdAt TEXT NOT NULL,
       recurringId TEXT,
       FOREIGN KEY (accountId) REFERENCES accounts(id) ON DELETE CASCADE,
+      FOREIGN KEY (toAccountId) REFERENCES accounts(id) ON DELETE CASCADE,
       FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
       FOREIGN KEY (recurringId) REFERENCES recurring_transactions(id) ON DELETE SET NULL
     );
@@ -149,6 +151,12 @@ export async function initDb(userDataDir: string) {
     persist()
   }
 
+  const hasToAccountId = transactionColumns[0]?.values.some((row) => row[1] === 'toAccountId') ?? false
+  if (!hasToAccountId) {
+    db.run('ALTER TABLE transactions ADD COLUMN toAccountId TEXT')
+    persist()
+  }
+
   const recurringColumns = db.exec('PRAGMA table_info(recurring_transactions)')
   const hasEndDate = recurringColumns[0]?.values.some((row) => row[1] === 'endDate') ?? false
   if (!hasEndDate) {
@@ -207,11 +215,12 @@ function csvEscape(value: string): string {
 export function buildTransactionsCsv(): string {
   const accountName = new Map(listAccounts().map((a) => [a.id, a.name]))
   const categoryName = new Map(listCategories().map((c) => [c.id, c.name]))
-  const header = ['Date', 'Description', 'Account', 'Category', 'Type', 'Amount']
+  const header = ['Date', 'Description', 'Account', 'To Account', 'Category', 'Type', 'Amount']
   const rows = listTransactions().map((tx) => [
     tx.date,
     tx.description,
     accountName.get(tx.accountId) ?? '',
+    tx.toAccountId ? accountName.get(tx.toAccountId) ?? '' : '',
     tx.categoryId ? categoryName.get(tx.categoryId) ?? '' : '',
     tx.kind,
     tx.amount.toFixed(2),
@@ -316,8 +325,8 @@ export function listTransactions(): Transaction[] {
 export function createTransaction(input: Omit<Transaction, 'id' | 'createdAt' | 'recurringId'>): Transaction {
   const tx: Transaction = { ...input, id: randomUUID(), createdAt: new Date().toISOString(), recurringId: null }
   db.run(
-    'INSERT INTO transactions (id, accountId, categoryId, kind, amount, description, date, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [tx.id, tx.accountId, tx.categoryId, tx.kind, tx.amount, tx.description, tx.date, tx.createdAt],
+    'INSERT INTO transactions (id, accountId, toAccountId, categoryId, kind, amount, description, date, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [tx.id, tx.accountId, tx.toAccountId, tx.categoryId, tx.kind, tx.amount, tx.description, tx.date, tx.createdAt],
   )
   persist()
   return tx
@@ -332,8 +341,8 @@ export function updateTransaction(id: string, input: Partial<Omit<Transaction, '
   if (!current.id) return
   const merged = { ...current, ...input }
   db.run(
-    'UPDATE transactions SET accountId = ?, categoryId = ?, kind = ?, amount = ?, description = ?, date = ? WHERE id = ?',
-    [merged.accountId, merged.categoryId, merged.kind, merged.amount, merged.description, merged.date, id],
+    'UPDATE transactions SET accountId = ?, toAccountId = ?, categoryId = ?, kind = ?, amount = ?, description = ?, date = ? WHERE id = ?',
+    [merged.accountId, merged.toAccountId, merged.categoryId, merged.kind, merged.amount, merged.description, merged.date, id],
   )
   persist()
 }

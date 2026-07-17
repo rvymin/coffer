@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
-import { Plus, Receipt, Search, ListPlus, ArrowLeftRight, Repeat } from 'lucide-react'
+import { Plus, Receipt, Search, ListPlus, ArrowLeftRight, Repeat, Tag } from 'lucide-react'
 import type { FinanceData } from '../lib/useFinanceData'
 import type { Transaction, TxKind } from '../lib/types'
 import { formatMoney, todayIso, MAX_AMOUNT } from '../lib/format'
@@ -10,9 +10,11 @@ import BulkAddModal from '../components/BulkAddModal'
 import DateRangePicker from '../components/DateRangePicker'
 import Tooltip from '../components/Tooltip'
 import Select from '../components/Select'
+import ManageCategoriesModal from '../components/ManageCategoriesModal'
 
 interface FormState {
   accountId: string
+  toAccountId: string
   categoryId: string
   kind: TxKind
   amount: string
@@ -20,8 +22,8 @@ interface FormState {
   date: string
 }
 
-function emptyForm(accountId: string, categoryId: string): FormState {
-  return { accountId, categoryId, kind: 'expense', amount: '', description: '', date: todayIso() }
+function emptyForm(accountId: string, toAccountId: string, categoryId: string): FormState {
+  return { accountId, toAccountId, categoryId, kind: 'expense', amount: '', description: '', date: todayIso() }
 }
 
 export default function Transactions({ data }: { data: FinanceData }) {
@@ -29,7 +31,8 @@ export default function Transactions({ data }: { data: FinanceData }) {
   const [editing, setEditing] = useState<Transaction | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [showBulkForm, setShowBulkForm] = useState(false)
-  const [form, setForm] = useState<FormState>(emptyForm('', ''))
+  const [showCategories, setShowCategories] = useState(false)
+  const [form, setForm] = useState<FormState>(emptyForm('', '', ''))
 
   const [filterAccount, setFilterAccount] = useState('all')
   const [filterCategory, setFilterCategory] = useState('all')
@@ -68,7 +71,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
     }
     const defaultCategory = categories.find((c) => c.kind === 'expense')
     setEditing(null)
-    setForm(emptyForm(accounts[0].id, defaultCategory?.id ?? ''))
+    setForm(emptyForm(accounts[0].id, accounts[1]?.id ?? accounts[0].id, defaultCategory?.id ?? ''))
     setShowForm(true)
   }
 
@@ -84,6 +87,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
     setEditing(tx)
     setForm({
       accountId: tx.accountId,
+      toAccountId: tx.toAccountId ?? '',
       categoryId: tx.categoryId ?? '',
       kind: tx.kind,
       amount: String(tx.amount),
@@ -94,20 +98,33 @@ export default function Transactions({ data }: { data: FinanceData }) {
   }
 
   function handleKindChange(kind: TxKind) {
+    if (kind === 'transfer') {
+      const toAccountId = form.toAccountId !== form.accountId ? form.toAccountId : (accounts.find((a) => a.id !== form.accountId)?.id ?? '')
+      setForm({ ...form, kind, categoryId: '', toAccountId })
+      return
+    }
     const firstMatch = categories.find((c) => c.kind === kind)
     setForm({ ...form, kind, categoryId: firstMatch?.id ?? '' })
+  }
+
+  function handleFromAccountChange(accountId: string) {
+    const toAccountId = form.toAccountId === accountId ? (accounts.find((a) => a.id !== accountId)?.id ?? '') : form.toAccountId
+    setForm({ ...form, accountId, toAccountId })
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const amount = Number(form.amount)
     if (!amount || amount <= 0 || amount > MAX_AMOUNT || !form.accountId || !form.date) return
+    if (form.kind === 'transfer' && (!form.toAccountId || form.toAccountId === form.accountId)) return
     const payload = {
       accountId: form.accountId,
-      categoryId: form.categoryId || null,
+      toAccountId: form.kind === 'transfer' ? form.toAccountId : null,
+      categoryId: form.kind === 'transfer' ? null : form.categoryId || null,
       kind: form.kind,
       amount,
-      description: form.description.trim() || (form.kind === 'income' ? 'Income' : 'Expense'),
+      description:
+        form.description.trim() || (form.kind === 'income' ? 'Income' : form.kind === 'transfer' ? 'Transfer' : 'Expense'),
       date: form.date,
     }
     if (editing) {
@@ -134,6 +151,10 @@ export default function Transactions({ data }: { data: FinanceData }) {
       <div className="page-header">
         <h1>Transactions</h1>
         <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn" onClick={() => setShowCategories(true)}>
+            <Tag size={14} strokeWidth={2.25} />
+            Manage categories
+          </button>
           <button className="btn" onClick={openBulkCreate}>
             <ListPlus size={15} strokeWidth={2.25} />
             Quick add
@@ -224,7 +245,11 @@ export default function Transactions({ data }: { data: FinanceData }) {
                           </Tooltip>
                         )}
                       </td>
-                      <td>{account?.name ?? '—'}</td>
+                      <td>
+                        {tx.kind === 'transfer' && tx.toAccountId
+                          ? `${account?.name ?? '—'} → ${accountById.get(tx.toAccountId)?.name ?? '—'}`
+                          : (account?.name ?? '—')}
+                      </td>
                       <td>
                         {category ? (
                           <span className="tag">
@@ -274,6 +299,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
                 <Select value={form.kind} onChange={(v) => handleKindChange(v as TxKind)}>
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
+                  {accounts.length >= 2 && <option value="transfer">Transfer</option>}
                 </Select>
               </div>
               <div className="form-field">
@@ -298,10 +324,10 @@ export default function Transactions({ data }: { data: FinanceData }) {
                 />
               </div>
               <div className="form-field">
-                <label>Account</label>
+                <label>{form.kind === 'transfer' ? 'From account' : 'Account'}</label>
                 <Select
                   value={form.accountId}
-                  onChange={(v) => setForm({ ...form, accountId: v })}
+                  onChange={form.kind === 'transfer' ? handleFromAccountChange : (v) => setForm({ ...form, accountId: v })}
                 >
                   {accounts.map((a) => (
                     <option key={a.id} value={a.id}>
@@ -310,20 +336,35 @@ export default function Transactions({ data }: { data: FinanceData }) {
                   ))}
                 </Select>
               </div>
-              <div className="form-field">
-                <label>Category</label>
-                <Select
-                  value={form.categoryId}
-                  onChange={(v) => setForm({ ...form, categoryId: v })}
-                >
-                  <option value="">Uncategorized</option>
-                  {categoriesForKind.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Select>
-              </div>
+              {form.kind === 'transfer' ? (
+                <div className="form-field">
+                  <label>To account</label>
+                  <Select value={form.toAccountId} onChange={(v) => setForm({ ...form, toAccountId: v })}>
+                    {accounts
+                      .filter((a) => a.id !== form.accountId)
+                      .map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.name}
+                        </option>
+                      ))}
+                  </Select>
+                </div>
+              ) : (
+                <div className="form-field">
+                  <label>Category</label>
+                  <Select
+                    value={form.categoryId}
+                    onChange={(v) => setForm({ ...form, categoryId: v })}
+                  >
+                    <option value="">Uncategorized</option>
+                    {categoriesForKind.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              )}
               <div className="form-field">
                 <label>Date</label>
                 <input
@@ -347,6 +388,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
       )}
 
       {showBulkForm && <BulkAddModal data={data} onClose={() => setShowBulkForm(false)} />}
+      {showCategories && <ManageCategoriesModal data={data} onClose={() => setShowCategories(false)} />}
     </div>
   )
 }
