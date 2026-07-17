@@ -48,7 +48,11 @@ export default function Select({
       if (triggerRef.current?.contains(target) || listRef.current?.contains(target)) return
       setOpen(false)
     }
-    function handleScrollOrResize() {
+    function handleScrollOrResize(e: Event) {
+      // Scrolling inside our own option list (when it has more items than fit) fires a native
+      // 'scroll' event too — since capture-phase listeners on window see it, don't treat that as
+      // "the page scrolled out from under us" and close the list on the user mid-scroll.
+      if (e.target instanceof Node && listRef.current?.contains(e.target)) return
       setOpen(false)
     }
     document.addEventListener('mousedown', handlePointerDown)
