@@ -1,7 +1,7 @@
 {
   "name": "coffer",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Personal finance tracker for accounts, budgets, debt payoff, and net worth",
   "author": "rkim0704@gmail.com",
   "main": "dist-electron/main.js",
