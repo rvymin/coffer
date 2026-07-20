@@ -32,10 +32,15 @@ import {
   tooltipContentStyle,
   tooltipLabelStyle,
   tooltipItemStyle,
-  legendWrapperStyle,
   chartMargin,
   axisTickMargin,
+  gridStroke,
+  axisStroke,
+  seriesColors,
+  formatAxisMoney,
+  yAxisWidth,
 } from '../lib/chartTheme'
+import ChartLegend from '../components/ChartLegend'
 import Modal from '../components/Modal'
 import DebtPaymentsModal from '../components/DebtPaymentsModal'
 import ValueTooltip from '../components/Tooltip'
@@ -49,8 +54,6 @@ const DEBT_TYPES: { value: DebtType; label: string; icon: typeof CreditCard }[] 
   { value: 'personal_loan', label: 'Personal Loan', icon: HandCoins },
   { value: 'other', label: 'Other', icon: Landmark },
 ]
-
-const LINE_COLORS = ['#e04f5f', '#6d5ff0', '#f08c00', '#0c8599', '#9c36b5', '#40c057', '#e64980', '#1971c2']
 
 interface FormState {
   name: string
@@ -183,7 +186,9 @@ export default function Debts({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Debts</h1>
+        <div className="page-title">
+          <h1>Debts</h1>
+        </div>
         <button className="btn btn-primary" onClick={openCreate}>
           <Plus size={15} strokeWidth={2.5} />
           Add debt
@@ -202,39 +207,39 @@ export default function Debts({ data }: { data: FinanceData }) {
         <>
           <div className="card-grid">
             <div className="card stat-card">
+              <div className="stat-icon expense">
+                <TrendingDown size={19} strokeWidth={2} />
+              </div>
               <div className="stat-text">
                 <div className="stat-label">Total debt</div>
                 <div className="stat-value expense">{formatMoney(totalDebt)}</div>
               </div>
-              <div className="stat-icon expense">
-                <TrendingDown size={20} strokeWidth={2} />
-              </div>
             </div>
             <div className="card stat-card">
+              <div className="stat-icon">
+                <Wallet size={19} strokeWidth={2} />
+              </div>
               <div className="stat-text">
                 <div className="stat-label">Monthly payments</div>
                 <div className="stat-value">{formatMoney(totalMonthlyPayment)}</div>
               </div>
-              <div className="stat-icon">
-                <Wallet size={20} strokeWidth={2} />
-              </div>
             </div>
             <div className="card stat-card">
+              <div className="stat-icon income">
+                <BadgeDollarSign size={19} strokeWidth={2} />
+              </div>
               <div className="stat-text">
                 <div className="stat-label">Paid this month</div>
                 <div className="stat-value income">{formatMoney(paidThisMonth)}</div>
               </div>
-              <div className="stat-icon income">
-                <BadgeDollarSign size={20} strokeWidth={2} />
-              </div>
             </div>
             <div className="card stat-card">
+              <div className="stat-icon">
+                <CalendarCheck size={19} strokeWidth={2} />
+              </div>
               <div className="stat-text">
                 <div className="stat-label">Debt-free by</div>
                 <div className="stat-value">{debtFreeDate ? formatMonth(debtFreeDate.slice(0, 7)) : '—'}</div>
-              </div>
-              <div className="stat-icon">
-                <CalendarCheck size={20} strokeWidth={2} />
               </div>
             </div>
           </div>
@@ -268,20 +273,20 @@ export default function Debts({ data }: { data: FinanceData }) {
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={multiSeries.data} margin={chartMargin}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                     <XAxis
                       dataKey="label"
-                      stroke="var(--text)"
+                      stroke={axisStroke}
                       fontSize={11}
                       interval="preserveStartEnd"
                       minTickGap={40}
                       tickMargin={axisTickMargin}
                     />
                     <YAxis
-                      stroke="var(--text)"
+                      stroke={axisStroke}
                       fontSize={12}
-                      tickFormatter={(v) => formatMoney(v)}
-                      width={80}
+                      tickFormatter={formatAxisMoney}
+                      width={yAxisWidth}
                       tickMargin={axisTickMargin}
                     />
                     <Tooltip
@@ -290,14 +295,14 @@ export default function Debts({ data }: { data: FinanceData }) {
                       labelStyle={tooltipLabelStyle}
                       itemStyle={tooltipItemStyle}
                     />
-                    <Legend wrapperStyle={legendWrapperStyle} />
+                    <Legend content={<ChartLegend />} />
                     {multiSeries.lines.map((line, i) => (
                       <Line
                         key={line.id}
                         type="monotone"
                         dataKey={line.id}
                         name={line.name}
-                        stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                        stroke={seriesColors[i % seriesColors.length]}
                         strokeWidth={2}
                         dot={false}
                       />
@@ -317,20 +322,20 @@ export default function Debts({ data }: { data: FinanceData }) {
                   </p>
                   <ResponsiveContainer width="100%" height={240}>
                     <LineChart data={growthSeries} margin={chartMargin}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                       <XAxis
                         dataKey="label"
-                        stroke="var(--text)"
+                        stroke={axisStroke}
                         fontSize={11}
                         interval="preserveStartEnd"
                         minTickGap={40}
                         tickMargin={axisTickMargin}
                       />
                       <YAxis
-                        stroke="var(--text)"
+                        stroke={axisStroke}
                         fontSize={12}
-                        tickFormatter={(v) => formatMoney(v)}
-                        width={80}
+                        tickFormatter={formatAxisMoney}
+                        width={yAxisWidth}
                         tickMargin={axisTickMargin}
                       />
                       <Tooltip
@@ -364,20 +369,20 @@ export default function Debts({ data }: { data: FinanceData }) {
             ) : (
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={singleSeries} margin={chartMargin}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                   <XAxis
                     dataKey="label"
-                    stroke="var(--text)"
+                    stroke={axisStroke}
                     fontSize={11}
                     interval="preserveStartEnd"
                     minTickGap={40}
                     tickMargin={axisTickMargin}
                   />
                   <YAxis
-                    stroke="var(--text)"
+                    stroke={axisStroke}
                     fontSize={12}
-                    tickFormatter={(v) => formatMoney(v)}
-                    width={80}
+                    tickFormatter={formatAxisMoney}
+                    width={yAxisWidth}
                     tickMargin={axisTickMargin}
                   />
                   <Tooltip

@@ -34,37 +34,91 @@
   src: url('./assets/fonts/PublicSans-800.woff2') format('woff2');
 }
 
+/* ---------------------------------------------------------------------------
+   AURORA GLASS design language
+   - --ambient: fixed full-viewport aurora washes behind everything
+   - --surface / --glass-*: frosted translucency with --surface-solid fallbacks
+   - --grad-emerald: the luminous brand identity (nav active, brand tile, primary buttons)
+--------------------------------------------------------------------------- */
+
 :root {
-  --text: #5b5766;
-  --text-h: #17151f;
-  --text-dim: #8b8794;
+  --text: #474d52;
+  --text-h: #15181c;
+  --text-dim: #6b746d;
 
-  --bg: #f3f2f7;
-  --surface: #ffffff;
-  --surface-2: #f8f7fb;
-  --border: #e6e4ec;
-  --border-strong: #d9d6e2;
+  --bg: #f3f6f4;
+  --surface: rgba(255, 255, 255, 0.68);
+  --surface-2: rgba(255, 255, 255, 0.5);
+  --surface-solid: #ffffff;
+  --border: rgba(13, 38, 28, 0.08);
+  --border-strong: rgba(13, 38, 28, 0.15);
 
-  --accent: #6d5ff0;
-  --accent-2: #9b6ff5;
-  --accent-bg: rgba(109, 95, 240, 0.09);
-  --accent-border: rgba(109, 95, 240, 0.35);
+  --accent: #0b9065;
+  --accent-2: #34c98e;
+  --accent-bg: rgba(11, 144, 101, 0.08);
+  --accent-border: rgba(11, 144, 101, 0.35);
   --accent-contrast: #ffffff;
+  --ring: rgba(11, 144, 101, 0.4);
 
-  --income: #16a34a;
-  --income-bg: rgba(22, 163, 74, 0.1);
-  --expense: #e04f5f;
-  --expense-bg: rgba(224, 79, 95, 0.1);
+  --income: #0e9f6e;
+  --income-bg: rgba(14, 159, 110, 0.1);
+  --expense: #e1554f;
+  --expense-bg: rgba(225, 85, 79, 0.1);
+
+  /* Glass system */
+  --glass-blur: blur(20px) saturate(1.4);
+  --glass-hl: rgba(255, 255, 255, 0.75); /* inset top highlight */
+  --glass-strong: rgba(255, 255, 255, 0.88); /* dense data surfaces: tables, dropdowns */
+  --glass-modal: rgba(255, 255, 255, 0.78);
+  --control-bg: rgba(255, 255, 255, 0.55);
+  --input-bg: rgba(255, 255, 255, 0.65);
+  --grid-line: rgba(13, 38, 28, 0.06);
+  --scrollbar: rgba(13, 38, 28, 0.16);
+
+  /* Ambient aurora (fixed layer, pearl base with luminous mint/teal washes) */
+  --ambient:
+    radial-gradient(1100px 760px at 8% -12%, rgba(52, 211, 153, 0.14), transparent 62%),
+    radial-gradient(950px 720px at 108% 112%, rgba(45, 212, 191, 0.12), transparent 58%),
+    radial-gradient(760px 620px at 88% 6%, rgba(139, 92, 246, 0.05), transparent 60%);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.02;
+
+  /* Luminous emerald identity — white text on the darkest stop #1fa87a computes to 3.03:1,
+     acceptable for 600-weight button/nav text (bar: 3:1). */
+  --grad-emerald: linear-gradient(135deg, #1fa87a 0%, #149a8c 100%);
+  --glow: 0 4px 16px rgba(52, 211, 153, 0.35);
+  --glow-strong: 0 8px 26px rgba(52, 211, 153, 0.45);
+
+  /* Hero number gradient — light theme stops are deep enough that the LIGHTEST stop keeps
+     >= 4.5:1 against the effective light glass background (#0b7e6e -> 4.7:1). */
+  --hero-value-gradient: linear-gradient(120deg, #0a7a55, #0b7e6e);
+
+  /* Sidebar: deep botanical glass rail in both themes */
+  --sidebar-bg: rgba(12, 32, 24, 0.85);
+  --sidebar-solid: #0d2118;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #ffffff;
+  --sidebar-text-dim: rgba(255, 255, 255, 0.6);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-active-text: #ffffff;
+  --sidebar-card-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-card-border: rgba(255, 255, 255, 0.12);
 
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 18px;
+  --radius-lg: 16px;
   --radius-full: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(23, 21, 31, 0.05);
-  --shadow-md: 0 6px 16px -4px rgba(23, 21, 31, 0.1), 0 2px 4px -2px rgba(23, 21, 31, 0.06);
-  --shadow-lg: 0 20px 40px -12px rgba(23, 21, 31, 0.18);
-  --shadow-accent: 0 8px 20px -6px rgba(109, 95, 240, 0.45);
+  --shadow-sm: 0 1px 2px rgba(13, 38, 28, 0.06);
+  --shadow-md: 0 8px 24px -8px rgba(13, 38, 28, 0.12), 0 2px 6px rgba(13, 38, 28, 0.05);
+  --shadow-lg: 0 32px 64px -24px rgba(13, 38, 28, 0.22);
+
+  --chart-1: #0b9065;
+  --chart-2: #34c98e;
+  --chart-3: #e1554f;
+  --chart-4: #e8a13a;
+  --chart-5: #0c8599;
+  --chart-6: #5b8def;
 
   --sans: 'Public Sans', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   --mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
@@ -81,89 +135,208 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #a9a5b4;
-    --text-h: #f4f2f8;
-    --text-dim: #6f6b7c;
+    --text: #a7b3ac;
+    --text-h: #f1f5f2;
+    --text-dim: #7a867d;
 
-    --bg: #131217;
-    --surface: #1c1a22;
-    --surface-2: #232029;
-    --border: #2c2933;
-    --border-strong: #3a3644;
+    --bg: #080d0a;
+    --surface: rgba(17, 25, 21, 0.62);
+    --surface-2: rgba(255, 255, 255, 0.04);
+    --surface-solid: #121a16;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
 
-    --accent: #8a7bf7;
-    --accent-2: #b18cf9;
-    --accent-bg: rgba(138, 123, 247, 0.14);
-    --accent-border: rgba(138, 123, 247, 0.4);
+    --accent: #2fc98d;
+    --accent-2: #6fe3b4;
+    --accent-bg: rgba(47, 201, 141, 0.14);
+    --accent-border: rgba(47, 201, 141, 0.38);
     --accent-contrast: #ffffff;
+    --ring: rgba(47, 201, 141, 0.4);
 
-    --income: #4ade80;
-    --income-bg: rgba(74, 222, 128, 0.12);
-    --expense: #f87171;
-    --expense-bg: rgba(248, 113, 113, 0.12);
+    --income: #3ecf96;
+    --income-bg: rgba(62, 207, 150, 0.13);
+    --expense: #f0705f;
+    --expense-bg: rgba(240, 112, 95, 0.13);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.55);
-    --shadow-accent: 0 8px 20px -6px rgba(138, 123, 247, 0.4);
+    --glass-hl: rgba(255, 255, 255, 0.06);
+    --glass-strong: rgba(17, 25, 21, 0.85);
+    --glass-modal: rgba(17, 25, 21, 0.72);
+    --control-bg: rgba(255, 255, 255, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.04);
+    --grid-line: rgba(255, 255, 255, 0.05);
+    --scrollbar: rgba(255, 255, 255, 0.14);
+
+    --ambient:
+      radial-gradient(1100px 760px at 10% -12%, rgba(52, 211, 153, 0.13), transparent 62%),
+      radial-gradient(950px 720px at 106% 112%, rgba(45, 212, 191, 0.08), transparent 58%),
+      radial-gradient(760px 620px at 86% 8%, rgba(139, 92, 246, 0.05), transparent 60%);
+    --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    --noise-opacity: 0.028;
+
+    --glass-blur: blur(20px) saturate(1.4);
+    --grad-emerald: linear-gradient(135deg, #1fa87a 0%, #149a8c 100%);
+    --glow: 0 4px 16px rgba(52, 211, 153, 0.35);
+    --glow-strong: 0 8px 26px rgba(52, 211, 153, 0.45);
+
+    /* Dark theme: both stops are luminous against the dark glass (#34d399 -> 8.2:1). */
+    --hero-value-gradient: linear-gradient(120deg, #34d399, #2dd4bf);
+
+    --sidebar-bg: rgba(8, 19, 14, 0.78);
+    --sidebar-solid: #0a140f;
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-text: #ffffff;
+    --sidebar-text-dim: rgba(255, 255, 255, 0.6);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+    --sidebar-active-text: #ffffff;
+    --sidebar-card-bg: rgba(255, 255, 255, 0.06);
+    --sidebar-card-border: rgba(255, 255, 255, 0.12);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.65);
+
+    --chart-1: #2fc98d;
+    --chart-2: #6fe3b4;
+    --chart-3: #f0705f;
+    --chart-4: #efb35c;
+    --chart-5: #3fb6c9;
+    --chart-6: #7fa6f2;
   }
 }
 
 /* Manual theme override (Settings > Appearance) takes precedence over the OS preference above. */
 :root[data-theme='light'] {
-  --text: #5b5766;
-  --text-h: #17151f;
-  --text-dim: #8b8794;
+  --text: #474d52;
+  --text-h: #15181c;
+  --text-dim: #6b746d;
 
-  --bg: #f3f2f7;
-  --surface: #ffffff;
-  --surface-2: #f8f7fb;
-  --border: #e6e4ec;
-  --border-strong: #d9d6e2;
+  --bg: #f3f6f4;
+  --surface: rgba(255, 255, 255, 0.68);
+  --surface-2: rgba(255, 255, 255, 0.5);
+  --surface-solid: #ffffff;
+  --border: rgba(13, 38, 28, 0.08);
+  --border-strong: rgba(13, 38, 28, 0.15);
 
-  --accent: #6d5ff0;
-  --accent-2: #9b6ff5;
-  --accent-bg: rgba(109, 95, 240, 0.09);
-  --accent-border: rgba(109, 95, 240, 0.35);
+  --accent: #0b9065;
+  --accent-2: #34c98e;
+  --accent-bg: rgba(11, 144, 101, 0.08);
+  --accent-border: rgba(11, 144, 101, 0.35);
   --accent-contrast: #ffffff;
+  --ring: rgba(11, 144, 101, 0.4);
 
-  --income: #16a34a;
-  --income-bg: rgba(22, 163, 74, 0.1);
-  --expense: #e04f5f;
-  --expense-bg: rgba(224, 79, 95, 0.1);
+  --income: #0e9f6e;
+  --income-bg: rgba(14, 159, 110, 0.1);
+  --expense: #e1554f;
+  --expense-bg: rgba(225, 85, 79, 0.1);
 
-  --shadow-sm: 0 1px 2px rgba(23, 21, 31, 0.05);
-  --shadow-md: 0 6px 16px -4px rgba(23, 21, 31, 0.1), 0 2px 4px -2px rgba(23, 21, 31, 0.06);
-  --shadow-lg: 0 20px 40px -12px rgba(23, 21, 31, 0.18);
-  --shadow-accent: 0 8px 20px -6px rgba(109, 95, 240, 0.45);
+  --glass-blur: blur(20px) saturate(1.4);
+  --glass-hl: rgba(255, 255, 255, 0.75);
+  --glass-strong: rgba(255, 255, 255, 0.88);
+  --glass-modal: rgba(255, 255, 255, 0.78);
+  --control-bg: rgba(255, 255, 255, 0.55);
+  --input-bg: rgba(255, 255, 255, 0.65);
+  --grid-line: rgba(13, 38, 28, 0.06);
+  --scrollbar: rgba(13, 38, 28, 0.16);
+
+  --ambient:
+    radial-gradient(1100px 760px at 8% -12%, rgba(52, 211, 153, 0.14), transparent 62%),
+    radial-gradient(950px 720px at 108% 112%, rgba(45, 212, 191, 0.12), transparent 58%),
+    radial-gradient(760px 620px at 88% 6%, rgba(139, 92, 246, 0.05), transparent 60%);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.02;
+
+  --grad-emerald: linear-gradient(135deg, #1fa87a 0%, #149a8c 100%);
+  --glow: 0 4px 16px rgba(52, 211, 153, 0.35);
+  --glow-strong: 0 8px 26px rgba(52, 211, 153, 0.45);
+  --hero-value-gradient: linear-gradient(120deg, #0a7a55, #0b7e6e);
+
+  --sidebar-bg: rgba(12, 32, 24, 0.85);
+  --sidebar-solid: #0d2118;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #ffffff;
+  --sidebar-text-dim: rgba(255, 255, 255, 0.6);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-active-text: #ffffff;
+  --sidebar-card-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-card-border: rgba(255, 255, 255, 0.12);
+
+  --shadow-sm: 0 1px 2px rgba(13, 38, 28, 0.06);
+  --shadow-md: 0 8px 24px -8px rgba(13, 38, 28, 0.12), 0 2px 6px rgba(13, 38, 28, 0.05);
+  --shadow-lg: 0 32px 64px -24px rgba(13, 38, 28, 0.22);
+
+  --chart-1: #0b9065;
+  --chart-2: #34c98e;
+  --chart-3: #e1554f;
+  --chart-4: #e8a13a;
+  --chart-5: #0c8599;
+  --chart-6: #5b8def;
 }
 
 :root[data-theme='dark'] {
-  --text: #a9a5b4;
-  --text-h: #f4f2f8;
-  --text-dim: #6f6b7c;
+  --text: #a7b3ac;
+  --text-h: #f1f5f2;
+  --text-dim: #7a867d;
 
-  --bg: #131217;
-  --surface: #1c1a22;
-  --surface-2: #232029;
-  --border: #2c2933;
-  --border-strong: #3a3644;
+  --bg: #080d0a;
+  --surface: rgba(17, 25, 21, 0.62);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-solid: #121a16;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
 
-  --accent: #8a7bf7;
-  --accent-2: #b18cf9;
-  --accent-bg: rgba(138, 123, 247, 0.14);
-  --accent-border: rgba(138, 123, 247, 0.4);
+  --accent: #2fc98d;
+  --accent-2: #6fe3b4;
+  --accent-bg: rgba(47, 201, 141, 0.14);
+  --accent-border: rgba(47, 201, 141, 0.38);
   --accent-contrast: #ffffff;
+  --ring: rgba(47, 201, 141, 0.4);
 
-  --income: #4ade80;
-  --income-bg: rgba(74, 222, 128, 0.12);
-  --expense: #f87171;
-  --expense-bg: rgba(248, 113, 113, 0.12);
+  --income: #3ecf96;
+  --income-bg: rgba(62, 207, 150, 0.13);
+  --expense: #f0705f;
+  --expense-bg: rgba(240, 112, 95, 0.13);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.55);
-  --shadow-accent: 0 8px 20px -6px rgba(138, 123, 247, 0.4);
+  --glass-blur: blur(20px) saturate(1.4);
+  --glass-hl: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(17, 25, 21, 0.85);
+  --glass-modal: rgba(17, 25, 21, 0.72);
+  --control-bg: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(255, 255, 255, 0.04);
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --scrollbar: rgba(255, 255, 255, 0.14);
+
+  --ambient:
+    radial-gradient(1100px 760px at 10% -12%, rgba(52, 211, 153, 0.13), transparent 62%),
+    radial-gradient(950px 720px at 106% 112%, rgba(45, 212, 191, 0.08), transparent 58%),
+    radial-gradient(760px 620px at 86% 8%, rgba(139, 92, 246, 0.05), transparent 60%);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.028;
+
+  --grad-emerald: linear-gradient(135deg, #1fa87a 0%, #149a8c 100%);
+  --glow: 0 4px 16px rgba(52, 211, 153, 0.35);
+  --glow-strong: 0 8px 26px rgba(52, 211, 153, 0.45);
+  --hero-value-gradient: linear-gradient(120deg, #34d399, #2dd4bf);
+
+  --sidebar-bg: rgba(8, 19, 14, 0.78);
+  --sidebar-solid: #0a140f;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #ffffff;
+  --sidebar-text-dim: rgba(255, 255, 255, 0.6);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-active-text: #ffffff;
+  --sidebar-card-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-card-border: rgba(255, 255, 255, 0.12);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.65);
+
+  --chart-1: #2fc98d;
+  --chart-2: #6fe3b4;
+  --chart-3: #f0705f;
+  --chart-4: #efb35c;
+  --chart-5: #3fb6c9;
+  --chart-6: #7fa6f2;
 }
 
 * {
@@ -172,6 +345,28 @@
 
 body {
   margin: 0;
+}
+
+/* Ambient aurora — fixed layers that never repaint on scroll. The gradient wash sits at
+   z-index -2, the desaturated SVG grain at -1 (DOM order puts it above the wash), and all
+   glass surfaces blur/refract these layers via backdrop-filter. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--ambient);
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--noise);
+  opacity: var(--noise-opacity);
+  pointer-events: none;
 }
 
 #root {
@@ -190,11 +385,13 @@ h3 {
 }
 
 h1 {
-  font-size: 23px;
+  font-size: 24px;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 h2 {
-  font-size: 15.5px;
+  font-size: 16px;
+  font-weight: 750;
 }
 h3 {
   font-size: 13.5px;
@@ -217,18 +414,27 @@ table {
   border-collapse: collapse;
 }
 
+/* Keyboard focus is always visible: a 2px accent outline on anything focusable that doesn't
+   provide its own ring treatment (inputs/selects swap this for a soft ring — see App.css). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 ::selection {
   background: var(--accent-bg);
 }
 
+/* Thin, translucent glass-age scrollbars */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: var(--scrollbar);
   border-radius: var(--radius-full);
-  border: 2px solid var(--bg);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
   background: transparent;

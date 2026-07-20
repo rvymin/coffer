@@ -149,7 +149,9 @@ export default function Transactions({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Transactions</h1>
+        <div className="page-title">
+          <h1>Transactions</h1>
+        </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn" onClick={() => setShowCategories(true)}>
             <Tag size={14} strokeWidth={2.25} />
@@ -216,7 +218,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
             No transactions match your filters.
           </div>
         ) : (
-          <div className="card" style={{ padding: 0 }}>
+          <div className="card card-flush">
             <table className="data-table">
               <thead>
                 <tr>

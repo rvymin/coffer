@@ -209,6 +209,12 @@ export async function restoreFromFile(
 }
 
 function csvEscape(value: string): string {
+  // Neutralize spreadsheet formula injection: text starting with = + - @ runs as
+  // a formula when the CSV is opened in Excel/Sheets. Prefix with an apostrophe.
+  // Pure numbers (e.g. negative amounts) are safe and stay numeric.
+  if (/^[=+\-@]/.test(value) && !/^-?\d+(\.\d+)?$/.test(value)) {
+    value = `'${value}`
+  }
   return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
 }
 

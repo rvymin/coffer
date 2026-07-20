@@ -11,11 +11,10 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
 } from 'recharts'
 import {
-  Landmark,
   TrendingUp,
   TrendingDown,
   PiggyBank,
@@ -25,6 +24,8 @@ import {
   ArrowLeftRight,
   LineChart as LineChartIcon,
   Repeat,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import type { FinanceData } from '../lib/useFinanceData'
 import { formatMoney, currentMonth, formatMonth } from '../lib/format'
@@ -35,18 +36,28 @@ import {
   tooltipContentStyle,
   tooltipLabelStyle,
   tooltipItemStyle,
-  legendWrapperStyle,
   chartMargin,
   axisTickMargin,
+  gridStroke,
+  axisStroke,
+  formatAxisMoney,
+  yAxisWidth,
 } from '../lib/chartTheme'
-import { useHiddenStats } from '../lib/useHiddenStats'
 import StatCard from '../components/StatCard'
+import ChartLegend from '../components/ChartLegend'
 import ValueTooltip from '../components/Tooltip'
 import DateRangePicker from '../components/DateRangePicker'
 
-export default function Dashboard({ data }: { data: FinanceData }) {
+export default function Dashboard({
+  data,
+  amountsHidden,
+  onToggleAmounts,
+}: {
+  data: FinanceData
+  amountsHidden: boolean
+  onToggleAmounts: () => void
+}) {
   const { accounts, transactions, categoryById, debts, debtPayments, netWorth, totalAssets, totalDebt } = data
-  const { isHidden, toggle } = useHiddenStats()
   const month = currentMonth()
 
   const { income, expense } = useMemo(() => monthlyTotals(transactions, month), [transactions, month])
@@ -79,7 +90,7 @@ export default function Dashboard({ data }: { data: FinanceData }) {
       .map(([categoryId, amount]) => ({
         name: categoryById.get(categoryId)?.name ?? 'Other',
         value: amount,
-        color: categoryById.get(categoryId)?.color ?? '#868e96',
+        color: categoryById.get(categoryId)?.color ?? 'var(--text-dim)',
       }))
       .sort((a, b) => b.value - a.value)
   }, [transactions, range, categoryById])
@@ -105,40 +116,59 @@ export default function Dashboard({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Dashboard</h1>
+        <div className="page-title">
+          <h1>Dashboard</h1>
+        </div>
+        <button
+          className={`btn privacy-toggle${amountsHidden ? ' active' : ''}`}
+          onClick={onToggleAmounts}
+          aria-pressed={amountsHidden}
+        >
+          {amountsHidden ? (
+            <EyeOff size={15} strokeWidth={2} />
+          ) : (
+            <Eye size={15} strokeWidth={2} />
+          )}
+          {amountsHidden ? 'Show amounts' : 'Hide amounts'}
+        </button>
       </div>
 
       <div className="page-stack">
+        <div className="card hero-card">
+          <div className="hero-label">Net worth</div>
+          <div className="hero-value">{amountsHidden ? '••••••' : formatMoney(netWorth)}</div>
+          <div className="hero-chips">
+            <span className="hero-chip">
+              <TrendingUp size={13} strokeWidth={2.25} className="hero-chip-icon income" />
+              Total assets <strong>{amountsHidden ? '••••' : formatMoney(totalAssets)}</strong>
+            </span>
+            <span className="hero-chip">
+              <TrendingDown size={13} strokeWidth={2.25} className="hero-chip-icon expense" />
+              Total debt <strong>{amountsHidden ? '••••' : formatMoney(totalDebt)}</strong>
+            </span>
+          </div>
+        </div>
+
         <div className="card-grid">
-          <StatCard
-            label="Net worth"
-            value={formatMoney(netWorth)}
-            icon={Landmark}
-            hidden={isHidden('netWorth')}
-            onToggleHide={() => toggle('netWorth')}
-          />
           <StatCard
             label="Income this month"
             value={formatMoney(income)}
             icon={TrendingUp}
             tone="income"
-            hidden={isHidden('income')}
-            onToggleHide={() => toggle('income')}
+            hidden={amountsHidden}
           />
           <StatCard
             label="Expenses this month"
             value={formatMoney(expense)}
             icon={TrendingDown}
             tone="expense"
-            hidden={isHidden('expense')}
-            onToggleHide={() => toggle('expense')}
+            hidden={amountsHidden}
           />
           <StatCard
             label="Savings rate"
             value={income > 0 ? `${savingsRate.toFixed(0)}%` : '—'}
             icon={PiggyBank}
-            hidden={isHidden('savingsRate')}
-            onToggleHide={() => toggle('savingsRate')}
+            hidden={amountsHidden}
           />
           {debts.length > 0 && (
             <StatCard
@@ -146,8 +176,7 @@ export default function Dashboard({ data }: { data: FinanceData }) {
               value={formatMoney(totalDebt)}
               icon={CreditCard}
               tone="expense"
-              hidden={isHidden('totalDebt')}
-              onToggleHide={() => toggle('totalDebt')}
+              hidden={amountsHidden}
             />
           )}
         </div>
@@ -174,21 +203,38 @@ export default function Dashboard({ data }: { data: FinanceData }) {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={netWorthData} margin={chartMargin}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <AreaChart data={netWorthData} margin={chartMargin}>
+                <defs>
+                  {/* userSpaceOnUse spans the fixed 260px plot height, so the fade stays
+                      uniform no matter how extreme the data — a bounding-box gradient
+                      re-maps its fade to the data's extremes and renders as a hard-edged
+                      shaded block under the curve. */}
+                  <linearGradient
+                    id="netWorthFill"
+                    gradientUnits="userSpaceOnUse"
+                    x1="0"
+                    y1={chartMargin.top}
+                    x2="0"
+                    y2={260 - chartMargin.bottom}
+                  >
+                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.26} />
+                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                 <XAxis
                   dataKey="label"
-                  stroke="var(--text)"
+                  stroke={axisStroke}
                   fontSize={12}
                   minTickGap={30}
                   interval="preserveStartEnd"
                   tickMargin={axisTickMargin}
                 />
                 <YAxis
-                  stroke="var(--text)"
+                  stroke={axisStroke}
                   fontSize={12}
-                  tickFormatter={(v) => formatMoney(v)}
-                  width={80}
+                  tickFormatter={formatAxisMoney}
+                  width={yAxisWidth}
                   tickMargin={axisTickMargin}
                 />
                 <Tooltip
@@ -197,15 +243,16 @@ export default function Dashboard({ data }: { data: FinanceData }) {
                   labelStyle={tooltipLabelStyle}
                   itemStyle={tooltipItemStyle}
                 />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="netWorth"
                   name="Net worth"
                   stroke="var(--accent)"
                   strokeWidth={2.5}
+                  fill="url(#netWorthFill)"
                   dot={false}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           )}
         </div>
@@ -215,20 +262,20 @@ export default function Dashboard({ data }: { data: FinanceData }) {
             <h2 className="chart-title">Income vs expenses ({rangeLabel})</h2>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={series} margin={chartMargin}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                 <XAxis
                   dataKey="label"
-                  stroke="var(--text)"
+                  stroke={axisStroke}
                   fontSize={12}
                   minTickGap={30}
                   interval="preserveStartEnd"
                   tickMargin={axisTickMargin}
                 />
                 <YAxis
-                  stroke="var(--text)"
+                  stroke={axisStroke}
                   fontSize={12}
-                  tickFormatter={(v) => formatMoney(v)}
-                  width={80}
+                  tickFormatter={formatAxisMoney}
+                  width={yAxisWidth}
                   tickMargin={axisTickMargin}
                 />
                 <Tooltip
@@ -237,7 +284,7 @@ export default function Dashboard({ data }: { data: FinanceData }) {
                   labelStyle={tooltipLabelStyle}
                   itemStyle={tooltipItemStyle}
                 />
-                <Legend wrapperStyle={legendWrapperStyle} />
+                <Legend content={<ChartLegend />} />
                 <Bar dataKey="income" name="Income" fill="var(--income)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Expense" fill="var(--expense)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -324,8 +371,9 @@ export default function Dashboard({ data }: { data: FinanceData }) {
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <span className={`amount ${tx.kind}`}>
-                          {tx.kind === 'income' ? '+' : tx.kind === 'expense' ? '-' : ''}
-                          {formatMoney(tx.amount)}
+                          {amountsHidden
+                            ? '••••'
+                            : `${tx.kind === 'income' ? '+' : tx.kind === 'expense' ? '-' : ''}${formatMoney(tx.amount)}`}
                         </span>
                       </td>
                     </tr>

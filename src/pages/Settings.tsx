@@ -63,7 +63,9 @@ export default function Settings({
   return (
     <div>
       <div className="page-header">
-        <h1>Settings</h1>
+        <div className="page-title">
+          <h1>Settings</h1>
+        </div>
       </div>
 
       <div className="page-stack">

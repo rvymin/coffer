@@ -85,7 +85,9 @@ export default function Accounts({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Accounts</h1>
+        <div className="page-title">
+          <h1>Accounts</h1>
+        </div>
         <button className="btn btn-primary" onClick={openCreate}>
           <Plus size={15} strokeWidth={2.5} />
           Add account

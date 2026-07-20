@@ -146,7 +146,9 @@ export default function Recurring({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Recurring</h1>
+        <div className="page-title">
+          <h1>Recurring</h1>
+        </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {status && <small style={{ opacity: 0.7 }}>{status}</small>}
           <button className="btn" onClick={handleRunNow} disabled={running}>
@@ -169,7 +171,7 @@ export default function Recurring({ data }: { data: FinanceData }) {
           No recurring transactions yet. Add rent, subscriptions, or your paycheck so they post automatically.
         </div>
       ) : (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="card card-flush">
           <table className="data-table">
             <thead>
               <tr>

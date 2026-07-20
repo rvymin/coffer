@@ -61,7 +61,9 @@ export default function Budgets({ data }: { data: FinanceData }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Budgets</h1>
+        <div className="page-title">
+          <h1>Budgets</h1>
+        </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <button className="btn btn-sm" onClick={() => setShowCategories(true)}>
             <Tag size={14} strokeWidth={2.25} />
@@ -82,30 +84,30 @@ export default function Budgets({ data }: { data: FinanceData }) {
       <div className="page-stack">
         <div className="card-grid">
           <div className="card stat-card">
+            <div className="stat-icon">
+              <Target size={19} strokeWidth={2} />
+            </div>
             <div className="stat-text">
               <div className="stat-label">Total budgeted</div>
               <div className="stat-value">{formatMoney(totalBudget)}</div>
             </div>
-            <div className="stat-icon">
-              <Target size={20} strokeWidth={2} />
-            </div>
           </div>
           <div className="card stat-card">
+            <div className="stat-icon expense">
+              <TrendingDown size={19} strokeWidth={2} />
+            </div>
             <div className="stat-text">
               <div className="stat-label">Total spent</div>
               <div className="stat-value expense">{formatMoney(totalSpent)}</div>
             </div>
-            <div className="stat-icon expense">
-              <TrendingDown size={20} strokeWidth={2} />
-            </div>
           </div>
           <div className="card stat-card">
+            <div className="stat-icon">
+              <Scale size={19} strokeWidth={2} />
+            </div>
             <div className="stat-text">
               <div className="stat-label">Remaining</div>
               <div className="stat-value">{formatMoney(totalBudget - totalSpent)}</div>
-            </div>
-            <div className="stat-icon">
-              <Scale size={20} strokeWidth={2} />
             </div>
           </div>
         </div>

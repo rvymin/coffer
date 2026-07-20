@@ -21,6 +21,11 @@ function createWindow() {
     },
   })
 
+  // The app is fully local: deny new windows and block all in-window navigation
+  // so no remote or unexpected content can ever be loaded into the renderer.
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  win.webContents.on('will-navigate', (event) => event.preventDefault())
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
