@@ -34,7 +34,6 @@ table.data-table tbody tr {
   flex-shrink: 0;
   background: var(--sidebar-bg);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border-right: 1px solid var(--sidebar-border);
   padding: 20px 16px;
   display: flex;
@@ -242,7 +241,6 @@ table.data-table tbody tr {
 .card {
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px 22px;
@@ -573,7 +571,6 @@ table.data-table th {
      decorative surfaces; dense data headers stay crisp. */
   background: var(--surface-solid);
   backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
   text-align: left;
   padding: 10px 16px;
   border-bottom: 1px solid var(--border);
@@ -707,7 +704,6 @@ table.data-table tbody tr:last-child td {
   transform: translateY(-100%);
   background: var(--glass-strong);
   backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
   border: 1px solid var(--border-strong);
   border-radius: 10px;
   box-shadow: var(--shadow-md);
@@ -861,7 +857,6 @@ table.data-table tbody tr:last-child td {
   overflow-y: auto;
   background: var(--glass-strong);
   backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -896,7 +891,6 @@ table.data-table tbody tr:last-child td {
   inset: 0;
   background: rgba(4, 8, 6, 0.5);
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -907,7 +901,6 @@ table.data-table tbody tr:last-child td {
 .modal {
   background: var(--glass-modal);
   backdrop-filter: blur(28px) saturate(1.5);
-  -webkit-backdrop-filter: blur(28px) saturate(1.5);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 22px 24px;
@@ -1428,7 +1421,7 @@ table.data-table tbody tr:last-child td {
 /* ---- Solid fallback if backdrop-filter is ever unavailable --------------------
    Electron's Chromium always supports it, but if a platform doesn't, glass surfaces fall
    back to solid theme tokens so nothing ever becomes unreadable. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports not (backdrop-filter: blur(1px)) {
   .card,
   .modal,
   .app-select-list,
