@@ -14,6 +14,7 @@ import { useFinanceData } from './lib/useFinanceData'
 import { useTheme } from './lib/useTheme'
 import { useHiddenStats } from './lib/useHiddenStats'
 import { formatMoney } from './lib/format'
+import Tooltip from './components/Tooltip'
 import logoMark from './assets/logo-mark.png'
 import Dashboard from './pages/Dashboard'
 import Accounts from './pages/Accounts'
@@ -83,7 +84,13 @@ function App() {
               </button>
             </div>
             <div className="sidebar-networth-value">
-              {amountsHidden ? '••••••' : formatMoney(data.netWorth)}
+              {amountsHidden ? (
+                <span className="masked-dots">••••••</span>
+              ) : (
+                <Tooltip content={formatMoney(data.netWorth)}>
+                  <span>{formatMoney(data.netWorth)}</span>
+                </Tooltip>
+              )}
             </div>
           </div>
         )}

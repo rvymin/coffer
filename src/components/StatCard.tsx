@@ -20,10 +20,14 @@ export default function StatCard({
         <Icon size={19} strokeWidth={2} />
       </div>
       <div className="stat-text">
-        <div className="stat-label">{label}</div>
-        <div className={`stat-value${tone ? ` ${tone}` : ''}`}>
+        <div className="stat-label">
+          <Tooltip content={label}>
+            <span>{label}</span>
+          </Tooltip>
+        </div>
+        <div className={`stat-value${tone ? ` ${tone}` : ''}${hidden ? ' masked' : ''}`}>
           {hidden ? (
-            '••••••'
+            <span className="masked-dots">••••••</span>
           ) : (
             <Tooltip content={value}>
               <span>{value}</span>

@@ -301,6 +301,7 @@ table.data-table tbody tr {
 
 .hero-value {
   width: fit-content;
+  max-width: 100%;
   margin-top: 6px;
   font-size: 36px;
   font-weight: 800;
@@ -311,6 +312,30 @@ table.data-table tbody tr {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Negative net worth flips the gradient number to the expense color; zero and
+   positive keep the default emerald gradient. */
+.hero-value.negative {
+  background: var(--expense);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Hidden net worth masks to neutral white dots — no gradient, no negative tint. */
+.hero-value.masked {
+  background: none;
+  color: var(--text-h);
+}
+
+/* Masked amounts: slightly larger than the surrounding text with airier spacing,
+   scaling with each value's own font size so big numbers get big dots. */
+.masked-dots {
+  font-size: 1.125em;
+  letter-spacing: 0.22em;
 }
 
 .hero-chips {
@@ -333,6 +358,16 @@ table.data-table tbody tr {
   font-weight: 600;
   color: var(--text-dim);
   white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hero-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .hero-chip strong {
@@ -401,6 +436,11 @@ table.data-table tbody tr {
 }
 .stat-value.expense {
   color: var(--expense);
+}
+
+/* Hidden amounts mask to neutral dots — never tinted by the value's tone. */
+.stat-value.masked {
+  color: var(--text-h);
 }
 
 .stat-icon {
@@ -653,6 +693,10 @@ table.data-table tbody tr:last-child td {
 .amount.transfer {
   color: var(--text-dim);
   font-weight: 600;
+}
+
+.amount.masked {
+  color: var(--text-h);
 }
 
 /* Status messages (e.g. "payment doesn't cover interest") — unlike .amount, these are prose,
@@ -1116,23 +1160,41 @@ table.data-table tbody tr:last-child td {
 /* ---- Budgets ---- */
 
 .budget-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(96px, 160px) minmax(0, 1fr) minmax(80px, 120px) 76px;
   align-items: center;
   gap: 14px;
-  flex-wrap: wrap;
   padding: 13px 0;
   border-bottom: 1px solid var(--border);
 }
 
 .budget-row > div {
-  flex: 1 1 160px;
   min-width: 0;
+}
+
+/* Very narrow windows only: drop the aligned columns and let each row's
+   contents wrap instead of overflowing the card. */
+@media (max-width: 700px) {
+  .budget-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .budget-row > div {
+    flex: 1 1 160px;
+  }
+
+  .budget-row input {
+    flex: 0 1 110px;
+    width: auto;
+  }
 }
 
 .budget-row .tag {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .budget-row:last-child {
@@ -1165,7 +1227,7 @@ table.data-table tbody tr:last-child td {
   border: 1px solid var(--border);
   background: var(--input-bg);
   color: var(--text-h);
-  flex: 0 1 110px;
+  width: 100%;
   min-width: 0;
   transition-duration: 0.15s;
   transition-property: border-color, box-shadow, background-color;

@@ -5,6 +5,7 @@ import type { Budget } from '../lib/types'
 import { formatMoney, formatMonth, currentMonth, MAX_AMOUNT } from '../lib/format'
 import { spendingByCategory } from '../lib/calc'
 import ManageCategoriesModal from '../components/ManageCategoriesModal'
+import Tooltip from '../components/Tooltip'
 
 export default function Budgets({ data }: { data: FinanceData }) {
   const { categories, budgets, transactions, refresh } = data
@@ -88,8 +89,16 @@ export default function Budgets({ data }: { data: FinanceData }) {
               <Target size={19} strokeWidth={2} />
             </div>
             <div className="stat-text">
-              <div className="stat-label">Total budgeted</div>
-              <div className="stat-value">{formatMoney(totalBudget)}</div>
+              <div className="stat-label">
+                <Tooltip content="Total budgeted">
+                  <span>Total budgeted</span>
+                </Tooltip>
+              </div>
+              <div className="stat-value">
+                <Tooltip content={formatMoney(totalBudget)}>
+                  <span>{formatMoney(totalBudget)}</span>
+                </Tooltip>
+              </div>
             </div>
           </div>
           <div className="card stat-card">
@@ -97,8 +106,16 @@ export default function Budgets({ data }: { data: FinanceData }) {
               <TrendingDown size={19} strokeWidth={2} />
             </div>
             <div className="stat-text">
-              <div className="stat-label">Total spent</div>
-              <div className="stat-value expense">{formatMoney(totalSpent)}</div>
+              <div className="stat-label">
+                <Tooltip content="Total spent">
+                  <span>Total spent</span>
+                </Tooltip>
+              </div>
+              <div className="stat-value expense">
+                <Tooltip content={formatMoney(totalSpent)}>
+                  <span>{formatMoney(totalSpent)}</span>
+                </Tooltip>
+              </div>
             </div>
           </div>
           <div className="card stat-card">
@@ -106,8 +123,16 @@ export default function Budgets({ data }: { data: FinanceData }) {
               <Scale size={19} strokeWidth={2} />
             </div>
             <div className="stat-text">
-              <div className="stat-label">Remaining</div>
-              <div className="stat-value">{formatMoney(totalBudget - totalSpent)}</div>
+              <div className="stat-label">
+                <Tooltip content="Remaining">
+                  <span>Remaining</span>
+                </Tooltip>
+              </div>
+              <div className="stat-value">
+                <Tooltip content={formatMoney(totalBudget - totalSpent)}>
+                  <span>{formatMoney(totalBudget - totalSpent)}</span>
+                </Tooltip>
+              </div>
             </div>
           </div>
         </div>
@@ -130,7 +155,9 @@ export default function Budgets({ data }: { data: FinanceData }) {
                 <div key={c.id} className="budget-row">
                   <span className="tag">
                     <span className="tag-dot" style={{ background: c.color }} />
-                    {c.name}
+                    <Tooltip content={c.name}>
+                      <span>{c.name}</span>
+                    </Tooltip>
                   </span>
                   <div>
                     <div className="budget-progress-track">

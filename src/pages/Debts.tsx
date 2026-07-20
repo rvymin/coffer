@@ -211,8 +211,16 @@ export default function Debts({ data }: { data: FinanceData }) {
                 <TrendingDown size={19} strokeWidth={2} />
               </div>
               <div className="stat-text">
-                <div className="stat-label">Total debt</div>
-                <div className="stat-value expense">{formatMoney(totalDebt)}</div>
+                <div className="stat-label">
+                  <ValueTooltip content="Total debt">
+                    <span>Total debt</span>
+                  </ValueTooltip>
+                </div>
+                <div className="stat-value expense">
+                  <ValueTooltip content={formatMoney(totalDebt)}>
+                    <span>{formatMoney(totalDebt)}</span>
+                  </ValueTooltip>
+                </div>
               </div>
             </div>
             <div className="card stat-card">
@@ -220,8 +228,16 @@ export default function Debts({ data }: { data: FinanceData }) {
                 <Wallet size={19} strokeWidth={2} />
               </div>
               <div className="stat-text">
-                <div className="stat-label">Monthly payments</div>
-                <div className="stat-value">{formatMoney(totalMonthlyPayment)}</div>
+                <div className="stat-label">
+                  <ValueTooltip content="Monthly payments">
+                    <span>Monthly payments</span>
+                  </ValueTooltip>
+                </div>
+                <div className="stat-value">
+                  <ValueTooltip content={formatMoney(totalMonthlyPayment)}>
+                    <span>{formatMoney(totalMonthlyPayment)}</span>
+                  </ValueTooltip>
+                </div>
               </div>
             </div>
             <div className="card stat-card">
@@ -229,8 +245,16 @@ export default function Debts({ data }: { data: FinanceData }) {
                 <BadgeDollarSign size={19} strokeWidth={2} />
               </div>
               <div className="stat-text">
-                <div className="stat-label">Paid this month</div>
-                <div className="stat-value income">{formatMoney(paidThisMonth)}</div>
+                <div className="stat-label">
+                  <ValueTooltip content="Paid this month">
+                    <span>Paid this month</span>
+                  </ValueTooltip>
+                </div>
+                <div className="stat-value income">
+                  <ValueTooltip content={formatMoney(paidThisMonth)}>
+                    <span>{formatMoney(paidThisMonth)}</span>
+                  </ValueTooltip>
+                </div>
               </div>
             </div>
             <div className="card stat-card">
@@ -238,8 +262,16 @@ export default function Debts({ data }: { data: FinanceData }) {
                 <CalendarCheck size={19} strokeWidth={2} />
               </div>
               <div className="stat-text">
-                <div className="stat-label">Debt-free by</div>
-                <div className="stat-value">{debtFreeDate ? formatMonth(debtFreeDate.slice(0, 7)) : '—'}</div>
+                <div className="stat-label">
+                  <ValueTooltip content="Debt-free by">
+                    <span>Debt-free by</span>
+                  </ValueTooltip>
+                </div>
+                <div className="stat-value">
+                  <ValueTooltip content={debtFreeDate ? formatMonth(debtFreeDate.slice(0, 7)) : '—'}>
+                    <span>{debtFreeDate ? formatMonth(debtFreeDate.slice(0, 7)) : '—'}</span>
+                  </ValueTooltip>
+                </div>
               </div>
             </div>
           </div>

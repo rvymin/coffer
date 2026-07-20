@@ -1,10 +1,12 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 // Drop-in replacement for the native `title` attribute — that renders as an OS tooltip that can't
 // be restyled, so anywhere we need a "full value on hover" affordance (e.g. a truncated number)
-// uses this instead. Positioned via getBoundingClientRect + `position: fixed` rather than
-// `position: absolute` so it isn't clipped by an ancestor with `overflow: hidden` (as stat values
-// and balances are, for the ellipsis truncation).
+// uses this instead. The popup is portaled to <body> and positioned via getBoundingClientRect +
+// `position: fixed`: glass cards use backdrop-filter, which makes each card a containing block for
+// fixed-position descendants — an inline popup would be positioned relative to the card (landing
+// in the wrong place) and trapped in the card's stacking context (painted behind sibling cards).
 export default function Tooltip({
   content,
   children,
@@ -40,11 +42,13 @@ export default function Tooltip({
       onMouseLeave={() => setPos(null)}
     >
       {children}
-      {pos && (
-        <span className="app-tooltip" style={{ top: pos.top - 8, left: pos.left }}>
-          {content}
-        </span>
-      )}
+      {pos &&
+        createPortal(
+          <span className="app-tooltip" style={{ top: pos.top - 8, left: pos.left }}>
+            {content}
+          </span>,
+          document.body
+        )}
     </span>
   )
 }

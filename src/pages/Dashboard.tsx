@@ -136,15 +136,47 @@ export default function Dashboard({
       <div className="page-stack">
         <div className="card hero-card">
           <div className="hero-label">Net worth</div>
-          <div className="hero-value">{amountsHidden ? '••••••' : formatMoney(netWorth)}</div>
+          <div className={`hero-value${netWorth < 0 ? ' negative' : ''}${amountsHidden ? ' masked' : ''}`}>
+            {amountsHidden ? (
+              <span className="masked-dots">••••••</span>
+            ) : (
+              <ValueTooltip content={formatMoney(netWorth)}>
+                <span>{formatMoney(netWorth)}</span>
+              </ValueTooltip>
+            )}
+          </div>
           <div className="hero-chips">
             <span className="hero-chip">
               <TrendingUp size={13} strokeWidth={2.25} className="hero-chip-icon income" />
-              Total assets <strong>{amountsHidden ? '••••' : formatMoney(totalAssets)}</strong>
+              <span className="hero-chip-text">
+                {amountsHidden ? (
+                  <>
+                    Total assets <strong className="masked-dots">••••</strong>
+                  </>
+                ) : (
+                  <ValueTooltip content={`Total assets ${formatMoney(totalAssets)}`}>
+                    <span>
+                      Total assets <strong>{formatMoney(totalAssets)}</strong>
+                    </span>
+                  </ValueTooltip>
+                )}
+              </span>
             </span>
             <span className="hero-chip">
               <TrendingDown size={13} strokeWidth={2.25} className="hero-chip-icon expense" />
-              Total debt <strong>{amountsHidden ? '••••' : formatMoney(totalDebt)}</strong>
+              <span className="hero-chip-text">
+                {amountsHidden ? (
+                  <>
+                    Total debt <strong className="masked-dots">••••</strong>
+                  </>
+                ) : (
+                  <ValueTooltip content={`Total debt ${formatMoney(totalDebt)}`}>
+                    <span>
+                      Total debt <strong>{formatMoney(totalDebt)}</strong>
+                    </span>
+                  </ValueTooltip>
+                )}
+              </span>
             </span>
           </div>
         </div>
@@ -370,10 +402,12 @@ export default function Dashboard({
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <span className={`amount ${tx.kind}`}>
-                          {amountsHidden
-                            ? '••••'
-                            : `${tx.kind === 'income' ? '+' : tx.kind === 'expense' ? '-' : ''}${formatMoney(tx.amount)}`}
+                        <span className={`amount ${tx.kind}${amountsHidden ? ' masked' : ''}`}>
+                          {amountsHidden ? (
+                            <span className="masked-dots">••••</span>
+                          ) : (
+                            `${tx.kind === 'income' ? '+' : tx.kind === 'expense' ? '-' : ''}${formatMoney(tx.amount)}`
+                          )}
                         </span>
                       </td>
                     </tr>

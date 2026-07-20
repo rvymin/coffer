@@ -1,5 +1,7 @@
 import { Children, isValidElement, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown } from 'lucide-react'
+import Tooltip from './Tooltip'
 
 interface OptionData {
   value: string
@@ -9,7 +11,8 @@ interface OptionData {
 // Drop-in replacement for the native <select>. Chromium/Windows renders a select's open option
 // list as a native popup that only follows the OS light/dark setting — it can't be themed to
 // match the app's own accent colors or its manual theme toggle, so it always looks out of place.
-// This renders the list itself (`position: fixed`, same escape-the-card trick as Tooltip) so it's
+// This renders the list itself — portaled to <body> and `position: fixed`, same as Tooltip, so
+// glass cards' backdrop-filter can't displace it or trap it behind sibling cards — so it's
 // themed exactly like the rest of Coffer. No wrapper element — the trigger button sizes exactly
 // like a native <select> would in every layout context (toolbar row, form-field column, table cell).
 export default function Select({
@@ -122,31 +125,48 @@ export default function Select({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span>{selectedLabel}</span>
+        <span>
+          {typeof selectedLabel === 'string' ? (
+            <Tooltip content={selectedLabel}>
+              <span>{selectedLabel}</span>
+            </Tooltip>
+          ) : (
+            selectedLabel
+          )}
+        </span>
         <ChevronDown size={15} strokeWidth={2.25} className="app-select-chevron" />
       </button>
-      {open && pos && (
-        <ul
-          className="app-select-list"
-          role="listbox"
-          ref={listRef}
-          style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
-        >
-          {options.map((opt, i) => (
-            <li
-              key={opt.value}
-              role="option"
-              aria-selected={opt.value === value}
-              className={`app-select-option${opt.value === value ? ' selected' : ''}${i === highlighted ? ' highlighted' : ''}`}
-              onMouseEnter={() => setHighlighted(i)}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => choose(i)}
-            >
-              {opt.label}
-            </li>
-          ))}
-        </ul>
-      )}
+      {open &&
+        pos &&
+        createPortal(
+          <ul
+            className="app-select-list"
+            role="listbox"
+            ref={listRef}
+            style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
+          >
+            {options.map((opt, i) => (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={opt.value === value}
+                className={`app-select-option${opt.value === value ? ' selected' : ''}${i === highlighted ? ' highlighted' : ''}`}
+                onMouseEnter={() => setHighlighted(i)}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => choose(i)}
+              >
+                {typeof opt.label === 'string' ? (
+                  <Tooltip content={opt.label}>
+                    <span>{opt.label}</span>
+                  </Tooltip>
+                ) : (
+                  opt.label
+                )}
+              </li>
+            ))}
+          </ul>,
+          document.body
+        )}
     </>
   )
 }
