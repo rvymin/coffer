@@ -1,7 +1,7 @@
 {
   "name": "coffer",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Personal finance tracker for accounts, budgets, debt payoff, and net worth",
   "author": "rkim0704@gmail.com",
   "main": "dist-electron/main.js",
@@ -29,14 +29,28 @@
       "target": "nsis",
       "icon": "build/icon.ico"
     },
+    "nsis": {
+      "artifactName": "${productName}.Setup.${version}.${ext}"
+    },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "build/icon.icns",
       "category": "public.app-category.finance"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "rvymin",
+        "repo": "coffer"
+      }
+    ]
   },
   "dependencies": {
     "date-fns": "^4.4.0",
+    "electron-updater": "^6.8.9",
     "lucide-react": "^1.24.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

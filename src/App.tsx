@@ -23,6 +23,7 @@ import Budgets from './pages/Budgets'
 import Debts from './pages/Debts'
 import Settings from './pages/Settings'
 import DialogHost from './components/DialogHost'
+import UpdateBanner from './components/UpdateBanner'
 import './App.css'
 
 type Tab = 'dashboard' | 'transactions' | 'recurring' | 'accounts' | 'debts' | 'budgets' | 'settings'
@@ -44,7 +45,9 @@ function App() {
   const { hidden: amountsHidden, toggle: toggleAmounts } = useHiddenStats()
 
   return (
-    <div className="app-shell">
+    <div className="app-root">
+      <UpdateBanner />
+      <div className="app-shell">
       <nav className="sidebar">
         <div className="brand">
           <div className="brand-mark">
@@ -106,6 +109,7 @@ function App() {
         )}
       </main>
       <DialogHost />
+      </div>
     </div>
   )
 }

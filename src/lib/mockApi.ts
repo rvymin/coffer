@@ -479,6 +479,19 @@ function createMockApi(state: MockState): Api {
         state.categories = defaultCategories()
       },
     },
+    updates: {
+      // Auto-updates only exist in the packaged Electron app; the browser mock reports dev mode.
+      getVersion: async () => 'dev-browser',
+      getLastStatus: async () => null,
+      getPlatform: async () => 'web',
+      check: async () => ({ ok: false, dev: true }),
+      download: async () => ({ ok: false, dev: true }),
+      install: async () => {},
+      openDownloadPage: async () => {},
+      canSimulate: async () => false,
+      simulate: async () => ({ ok: false }),
+      onStatus: () => () => {},
+    },
   }
 }
 

@@ -92,6 +92,20 @@ export interface ImportResult {
   error?: string
 }
 
+export type UpdateStatus =
+  | { state: 'checking' }
+  | { state: 'available'; version: string }
+  | { state: 'none' }
+  | { state: 'downloading'; percent: number }
+  | { state: 'ready'; version: string }
+  | { state: 'error'; message: string }
+
+export interface UpdateActionResult {
+  ok: boolean
+  dev?: boolean
+  error?: string
+}
+
 export interface Api {
   accounts: {
     list: () => Promise<Account[]>
@@ -138,6 +152,18 @@ export interface Api {
     exportDb: () => Promise<ExportResult>
     exportCsv: () => Promise<ExportResult>
     importDb: () => Promise<ImportResult>
+  }
+  updates: {
+    getVersion: () => Promise<string>
+    getLastStatus: () => Promise<UpdateStatus | null>
+    getPlatform: () => Promise<string>
+    check: () => Promise<UpdateActionResult>
+    download: () => Promise<UpdateActionResult>
+    install: () => Promise<void>
+    openDownloadPage: () => Promise<void>
+    canSimulate: () => Promise<boolean>
+    simulate: () => Promise<{ ok: boolean }>
+    onStatus: (callback: (status: UpdateStatus) => void) => () => void
   }
   app: {
     resetData: () => Promise<void>

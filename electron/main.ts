@@ -1,4 +1,6 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron'
+import { autoUpdater } from 'electron-updater'
+import { todayLocalIso } from './dates.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -7,6 +9,8 @@ import * as db from './db.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+
+let mainWindow: BrowserWindow | null = null
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -25,6 +29,11 @@ function createWindow() {
   // so no remote or unexpected content can ever be loaded into the renderer.
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
   win.webContents.on('will-navigate', (event) => event.preventDefault())
+
+  mainWindow = win
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null
+  })
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
@@ -71,7 +80,7 @@ function registerIpc() {
   ipcMain.handle('backup:exportDb', async () => {
     const result = await dialog.showSaveDialog({
       title: 'Backup database',
-      defaultPath: `finance-backup-${new Date().toISOString().slice(0, 10)}.db`,
+      defaultPath: `finance-backup-${todayLocalIso()}.db`,
       filters: [{ name: 'SQLite Database', extensions: ['db'] }],
     })
     if (result.canceled || !result.filePath) return { canceled: true }
@@ -82,7 +91,7 @@ function registerIpc() {
   ipcMain.handle('backup:exportCsv', async () => {
     const result = await dialog.showSaveDialog({
       title: 'Export transactions as CSV',
-      defaultPath: `transactions-${new Date().toISOString().slice(0, 10)}.csv`,
+      defaultPath: `transactions-${todayLocalIso()}.csv`,
       filters: [{ name: 'CSV', extensions: ['csv'] }],
     })
     if (result.canceled || !result.filePath) return { canceled: true }
@@ -106,6 +115,109 @@ function registerIpc() {
   })
 }
 
+type UpdateStatus =
+  | { state: 'checking' }
+  | { state: 'available'; version: string }
+  | { state: 'none' }
+  | { state: 'downloading'; percent: number }
+  | { state: 'ready'; version: string }
+  | { state: 'error'; message: string }
+
+let lastUpdateStatus: UpdateStatus | null = null
+
+function pushUpdateStatus(status: UpdateStatus) {
+  lastUpdateStatus = status
+  mainWindow?.webContents.send('updates:status', status)
+}
+
+function registerUpdates() {
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = true
+
+  autoUpdater.on('checking-for-update', () => pushUpdateStatus({ state: 'checking' }))
+  autoUpdater.on('update-available', (info) => pushUpdateStatus({ state: 'available', version: info.version }))
+  autoUpdater.on('update-not-available', () => pushUpdateStatus({ state: 'none' }))
+  autoUpdater.on('download-progress', (progress) =>
+    pushUpdateStatus({ state: 'downloading', percent: progress.percent })
+  )
+  autoUpdater.on('update-downloaded', (info) => pushUpdateStatus({ state: 'ready', version: info.version }))
+  autoUpdater.on('error', (err) => pushUpdateStatus({ state: 'error', message: err.message }))
+
+  ipcMain.handle('updates:getVersion', () => app.getVersion())
+  ipcMain.handle('updates:getLastStatus', () => lastUpdateStatus)
+  ipcMain.handle('updates:getPlatform', () => process.platform)
+  ipcMain.handle('updates:openDownloadPage', () =>
+    shell.openExternal('https://github.com/rvymin/coffer/releases/latest')
+  )
+
+  // Dev-only: lets the renderer fake the whole update flow (banner, progress,
+  // restart prompt) without a packaged build or a published release.
+  ipcMain.handle('updates:canSimulate', () => !app.isPackaged)
+  ipcMain.handle('updates:simulate', () => {
+    if (app.isPackaged) return { ok: false }
+    pushUpdateStatus({ state: 'checking' })
+    setTimeout(() => pushUpdateStatus({ state: 'available', version: SIMULATED_VERSION }), 1200)
+    return { ok: true }
+  })
+
+  ipcMain.handle('updates:check', async () => {
+    if (!app.isPackaged) return { ok: false, dev: true }
+    try {
+      await autoUpdater.checkForUpdates()
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) }
+    }
+  })
+
+  ipcMain.handle('updates:download', async () => {
+    if (!app.isPackaged) {
+      // In dev, a simulated "available" update gets a simulated download.
+      if (lastUpdateStatus?.state === 'available') {
+        simulateDownload(lastUpdateStatus.version)
+        return { ok: true }
+      }
+      return { ok: false, dev: true }
+    }
+    // Squirrel.Mac requires a signed build; unsigned macOS builds must update
+    // manually from the GitHub release page (the renderer handles this path).
+    if (process.platform === 'darwin') {
+      return { ok: false, error: 'In-app updates are not available on this macOS build.' }
+    }
+    try {
+      await autoUpdater.downloadUpdate()
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) }
+    }
+  })
+
+  ipcMain.handle('updates:install', () => {
+    if (!app.isPackaged) {
+      console.log('[main] dev mode — quitAndInstall skipped (nothing was really downloaded)')
+      return
+    }
+    autoUpdater.quitAndInstall()
+  })
+}
+
+// Obviously-fake version so simulated banners can't be mistaken for a real release.
+const SIMULATED_VERSION = '9.9.9'
+
+function simulateDownload(version: string) {
+  let percent = 0
+  const tick = () => {
+    percent += 8 + Math.random() * 10
+    if (percent >= 100) {
+      pushUpdateStatus({ state: 'ready', version })
+      return
+    }
+    pushUpdateStatus({ state: 'downloading', percent })
+    setTimeout(tick, 220)
+  }
+  setTimeout(tick, 300)
+}
+
 process.on('uncaughtException', (err) => {
   console.error('[main] uncaughtException', err)
 })
@@ -124,8 +236,15 @@ app.whenReady().then(async () => {
     console.error('[main] db init failed', err)
   }
   registerIpc()
+  registerUpdates()
   createWindow()
   console.log('[main] window created')
+
+  // Quietly look for a newer GitHub release at startup; failures are ignored
+  // so a flaky network never affects normal use.
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdates().catch(() => {})
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

@@ -68,8 +68,8 @@
   /* Glass system */
   --glass-blur: blur(20px) saturate(1.4);
   --glass-hl: rgba(255, 255, 255, 0.75); /* inset top highlight */
-  --glass-strong: rgba(255, 255, 255, 0.96); /* dense data surfaces: tables, dropdowns */
-  --glass-modal: rgba(255, 255, 255, 0.96);
+  --glass-strong: rgb(255, 255, 255); /* floating/dense surfaces: fully solid — frost comes from the backdrop blur, not transparency */
+  --glass-modal: rgb(255, 255, 255);
   --control-bg: rgba(255, 255, 255, 0.55);
   --input-bg: rgba(255, 255, 255, 0.65);
   --grid-line: rgba(13, 38, 28, 0.06);
@@ -159,8 +159,8 @@
     --expense-bg: rgba(240, 112, 95, 0.13);
 
     --glass-hl: rgba(255, 255, 255, 0.06);
-    --glass-strong: rgba(17, 25, 21, 0.95);
-    --glass-modal: rgba(17, 25, 21, 0.95);
+    --glass-strong: rgb(17, 25, 21);
+    --glass-modal: rgb(17, 25, 21);
     --control-bg: rgba(255, 255, 255, 0.05);
     --input-bg: rgba(255, 255, 255, 0.04);
     --grid-line: rgba(255, 255, 255, 0.05);
@@ -231,8 +231,8 @@
 
   --glass-blur: blur(20px) saturate(1.4);
   --glass-hl: rgba(255, 255, 255, 0.75);
-  --glass-strong: rgba(255, 255, 255, 0.96);
-  --glass-modal: rgba(255, 255, 255, 0.96);
+  --glass-strong: rgb(255, 255, 255);
+  --glass-modal: rgb(255, 255, 255);
   --control-bg: rgba(255, 255, 255, 0.55);
   --input-bg: rgba(255, 255, 255, 0.65);
   --grid-line: rgba(13, 38, 28, 0.06);
@@ -298,8 +298,8 @@
 
   --glass-blur: blur(20px) saturate(1.4);
   --glass-hl: rgba(255, 255, 255, 0.06);
-  --glass-strong: rgba(17, 25, 21, 0.95);
-  --glass-modal: rgba(17, 25, 21, 0.95);
+  --glass-strong: rgb(17, 25, 21);
+  --glass-modal: rgb(17, 25, 21);
   --control-bg: rgba(255, 255, 255, 0.05);
   --input-bg: rgba(255, 255, 255, 0.04);
   --grid-line: rgba(255, 255, 255, 0.05);

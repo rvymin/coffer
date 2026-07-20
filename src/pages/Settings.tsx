@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { DatabaseBackup, FileDown, FileUp, TriangleAlert } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { DatabaseBackup, Download, FileDown, FileUp, FlaskConical, RefreshCw, TriangleAlert } from 'lucide-react'
 import type { FinanceData } from '../lib/useFinanceData'
 import type { ThemePreference } from '../lib/useTheme'
+import type { UpdateStatus } from '../lib/types'
 import { confirmDialog } from '../lib/dialog'
 import Modal from '../components/Modal'
 
@@ -20,6 +21,43 @@ export default function Settings({
   const [showReset, setShowReset] = useState(false)
   const [confirmText, setConfirmText] = useState('')
   const [resetting, setResetting] = useState(false)
+  const [version, setVersion] = useState<string | null>(null)
+  const [updateState, setUpdateState] = useState<UpdateStatus | null>(null)
+  const [isMac, setIsMac] = useState(false)
+  const [canSimulate, setCanSimulate] = useState(false)
+  const checking = updateState?.state === 'checking'
+  const downloading = updateState?.state === 'downloading'
+
+  useEffect(() => {
+    window.api.updates.getVersion().then(setVersion).catch(() => {})
+    window.api.updates.getPlatform().then((p) => setIsMac(p === 'darwin')).catch(() => {})
+    window.api.updates.canSimulate().then(setCanSimulate).catch(() => {})
+    window.api.updates
+      .getLastStatus()
+      .then((s) => {
+        if (s) setUpdateState(s)
+      })
+      .catch(() => {})
+    return window.api.updates.onStatus(setUpdateState)
+  }, [])
+
+  async function handleCheckUpdates() {
+    setUpdateState({ state: 'checking' })
+    const result = await window.api.updates.check()
+    if (result.dev) {
+      setUpdateState({ state: 'error', message: 'Update checks only work in the installed app.' })
+    } else if (!result.ok) {
+      setUpdateState({ state: 'error', message: result.error ?? 'Something went wrong.' })
+    }
+    // On success the main process pushes the outcome via onStatus (none / available).
+  }
+
+  async function handleDownloadUpdate() {
+    const result = await window.api.updates.download()
+    if (!result.ok && !result.dev) {
+      setUpdateState({ state: 'error', message: result.error ?? 'Download failed.' })
+    }
+  }
 
   async function handleExportDb() {
     setStatus(null)
@@ -86,6 +124,73 @@ export default function Settings({
               Dark
             </button>
           </div>
+        </div>
+
+        <div className="card">
+          <h2>App updates</h2>
+          <p style={{ opacity: 0.75, marginTop: 4 }}>
+            Coffer v{version ?? '…'} — new versions are delivered through GitHub releases and install on
+            restart.
+          </p>
+          <div className="form-actions" style={{ justifyContent: 'flex-start', marginTop: 16 }}>
+            {updateState?.state === 'ready' ? (
+              <button className="btn btn-primary" onClick={() => window.api.updates.install()}>
+                <Download size={15} strokeWidth={2.25} />
+                Restart to install v{updateState.version}
+              </button>
+            ) : updateState?.state === 'available' ? (
+              <button
+                className="btn btn-primary"
+                onClick={isMac ? () => window.api.updates.openDownloadPage() : handleDownloadUpdate}
+                disabled={downloading}
+              >
+                <Download size={15} strokeWidth={2.25} />
+                {isMac ? `Get v${updateState.version} from GitHub` : `Download v${updateState.version}`}
+              </button>
+            ) : (
+              <button className="btn" onClick={handleCheckUpdates} disabled={checking || downloading}>
+                <RefreshCw size={15} strokeWidth={2.25} />
+                {checking ? 'Checking…' : 'Check for updates'}
+              </button>
+            )}
+            {canSimulate && (
+              <button
+                className="btn"
+                onClick={() => window.api.updates.simulate()}
+                title="Dev-only: fakes an update so you can preview the banner and this card"
+              >
+                <FlaskConical size={15} strokeWidth={2.25} />
+                Simulate update (dev)
+              </button>
+            )}
+          </div>
+          {updateState?.state === 'downloading' && (
+            <>
+              <div className="update-progress" style={{ marginTop: 16 }}>
+                <div
+                  className="update-progress-bar"
+                  style={{ width: `${Math.min(100, Math.round(updateState.percent))}%` }}
+                />
+              </div>
+              <p style={{ marginTop: 8, opacity: 0.8 }}>
+                Downloading update… {Math.round(updateState.percent)}%
+              </p>
+            </>
+          )}
+          {updateState?.state === 'none' && <p style={{ marginTop: 12, opacity: 0.8 }}>You're up to date.</p>}
+          {updateState?.state === 'error' && (
+            <p style={{ marginTop: 12, opacity: 0.8 }}>Couldn't check for updates — {updateState.message}</p>
+          )}
+          {updateState?.state === 'ready' && (
+            <p style={{ marginTop: 12, opacity: 0.8 }}>
+              v{updateState.version} is downloaded and will be installed when you restart.
+            </p>
+          )}
+          {isMac && updateState?.state === 'available' && (
+            <p style={{ marginTop: 12, opacity: 0.8 }}>
+              macOS builds update manually — the button opens the GitHub release page in your browser.
+            </p>
+          )}
         </div>
 
         <div className="card">

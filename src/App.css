@@ -1,7 +1,15 @@
-.app-shell {
+.app-root {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
+}
+
+.app-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -1434,4 +1442,92 @@ table.data-table tbody tr:last-child td {
   .sidebar {
     background: var(--sidebar-solid);
   }
+}
+
+/* ── Update progress ─────────────────────────────────────────────── */
+.update-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.update-progress-bar {
+  height: 100%;
+  background: var(--grad-emerald);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+/* ── Update banner ───────────────────────────────────────────────── */
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  color: var(--text-h);
+  background: var(--accent-bg);
+  border-bottom: 1px solid var(--accent-border);
+  flex-shrink: 0;
+}
+
+.update-banner-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.update-banner-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.update-banner-progress {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.update-banner-percent {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.update-banner-action {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-contrast);
+  background: var(--grad-emerald);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.update-banner-action:hover {
+  box-shadow: var(--glow);
+}
+
+.update-banner-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.update-banner-close:hover {
+  background: var(--border);
+  color: var(--text-h);
 }

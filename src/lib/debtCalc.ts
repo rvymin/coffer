@@ -18,7 +18,7 @@ export interface DebtForecast {
 
 export function forecastPayoff(balance: number, interestRatePercent: number, monthlyPayment: number): DebtForecast {
   if (balance <= 0) {
-    return { months: 0, payoffDate: new Date().toISOString().slice(0, 10), totalInterest: 0, payable: true }
+    return { months: 0, payoffDate: format(new Date(), 'yyyy-MM-dd'), totalInterest: 0, payable: true }
   }
   if (monthlyPayment <= 0) {
     return { months: null, payoffDate: null, totalInterest: null, payable: false }
@@ -47,7 +47,7 @@ export function forecastPayoff(balance: number, interestRatePercent: number, mon
     return { months: null, payoffDate: null, totalInterest: null, payable: false }
   }
 
-  const payoffDate = addMonths(new Date(), months).toISOString().slice(0, 10)
+  const payoffDate = format(addMonths(new Date(), months), 'yyyy-MM-dd')
   return { months, payoffDate, totalInterest: Math.round(totalInterest * 100) / 100, payable: true }
 }
 

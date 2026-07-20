@@ -22,6 +22,16 @@ export function currentMonth(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
 
+// Calendar date (YYYY-MM-DD) in the user's LOCAL timezone. Never build dates
+// with Date.toISOString() — it returns UTC, which can be a calendar day ahead
+// of local time in the evening (or a day behind, east of UTC).
+export function dateToLocalIso(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
+  return dateToLocalIso(new Date())
 }

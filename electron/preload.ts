@@ -47,6 +47,22 @@ const api = {
     exportCsv: () => ipcRenderer.invoke('backup:exportCsv'),
     importDb: () => ipcRenderer.invoke('backup:importDb'),
   },
+  updates: {
+    getVersion: () => ipcRenderer.invoke('updates:getVersion'),
+    getLastStatus: () => ipcRenderer.invoke('updates:getLastStatus'),
+    getPlatform: () => ipcRenderer.invoke('updates:getPlatform'),
+    check: () => ipcRenderer.invoke('updates:check'),
+    download: () => ipcRenderer.invoke('updates:download'),
+    install: () => ipcRenderer.invoke('updates:install'),
+    openDownloadPage: () => ipcRenderer.invoke('updates:openDownloadPage'),
+    canSimulate: () => ipcRenderer.invoke('updates:canSimulate'),
+    simulate: () => ipcRenderer.invoke('updates:simulate'),
+    onStatus: (callback: (status: unknown) => void) => {
+      const listener = (_event: unknown, status: unknown) => callback(status)
+      ipcRenderer.on('updates:status', listener)
+      return () => ipcRenderer.removeListener('updates:status', listener)
+    },
+  },
   app: {
     resetData: () => ipcRenderer.invoke('app:resetData'),
   },

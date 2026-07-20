@@ -4,6 +4,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { addWeeks, addMonths, addYears } from 'date-fns'
+import { localDateIso, todayLocalIso } from './dates.js'
 import type {
   Account,
   Category,
@@ -587,7 +588,7 @@ function advanceDate(dateIso: string, freq: RecurringFrequency): string {
   else if (freq === 'biweekly') next = addWeeks(d, 2)
   else if (freq === 'monthly') next = addMonths(d, 1)
   else next = addYears(d, 1)
-  return next.toISOString().slice(0, 10)
+  return localDateIso(next)
 }
 
 // Catches up any rules whose nextDate has arrived, posting one transaction per elapsed period
@@ -595,7 +596,7 @@ function advanceDate(dateIso: string, freq: RecurringFrequency): string {
 // endDate stop posting once nextDate would fall after it, and are auto-paused since they'll never
 // fire again.
 export function runRecurringTransactions(): { created: number } {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayLocalIso()
   const rules = rowsToObjects<Record<string, unknown>>(
     db.exec('SELECT * FROM recurring_transactions WHERE active = 1'),
   )
