@@ -149,7 +149,7 @@ export default function Recurring({ data }: { data: FinanceData }) {
         <div className="page-title">
           <h1>Recurring</h1>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className="header-actions">
           {status && <small style={{ opacity: 0.7 }}>{status}</small>}
           <button className="btn" onClick={handleRunNow} disabled={running}>
             <Play size={14} strokeWidth={2.25} />

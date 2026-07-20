@@ -224,6 +224,16 @@ table.data-table tbody tr {
   margin: 0;
 }
 
+/* Header button groups must wrap onto extra rows in narrow windows instead of
+   overflowing the page edge. */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
 .page-stack {
   display: flex;
   flex-direction: column;
@@ -339,7 +349,7 @@ table.data-table tbody tr {
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -486,6 +496,13 @@ table.data-table tbody tr {
   gap: 20px;
 }
 
+/* Stack the dashboard charts when the window gets too narrow for two columns. */
+@media (max-width: 1000px) {
+  .chart-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---- Buttons ---- */
 
 .btn {
@@ -499,6 +516,10 @@ table.data-table tbody tr {
   border-radius: var(--radius-full);
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   transition-duration: 0.15s;
   transition-property: border-color, background-color, filter, transform, box-shadow;
 }
@@ -1014,13 +1035,14 @@ table.data-table tbody tr:last-child td {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 /* ---- Accounts & debts ---- */
 
 .accounts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -1094,12 +1116,23 @@ table.data-table tbody tr:last-child td {
 /* ---- Budgets ---- */
 
 .budget-row {
-  display: grid;
-  grid-template-columns: 160px 1fr 120px 76px;
+  display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: wrap;
   padding: 13px 0;
   border-bottom: 1px solid var(--border);
+}
+
+.budget-row > div {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.budget-row .tag {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .budget-row:last-child {
@@ -1132,7 +1165,8 @@ table.data-table tbody tr:last-child td {
   border: 1px solid var(--border);
   background: var(--input-bg);
   color: var(--text-h);
-  width: 100px;
+  flex: 0 1 110px;
+  min-width: 0;
   transition-duration: 0.15s;
   transition-property: border-color, box-shadow, background-color;
 }
@@ -1374,6 +1408,8 @@ table.data-table tbody tr:last-child td {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-2);
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .segmented button {

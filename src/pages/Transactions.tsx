@@ -152,7 +152,7 @@ export default function Transactions({ data }: { data: FinanceData }) {
         <div className="page-title">
           <h1>Transactions</h1>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="header-actions">
           <button className="btn" onClick={() => setShowCategories(true)}>
             <Tag size={14} strokeWidth={2.25} />
             Manage categories
